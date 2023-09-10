@@ -40,7 +40,8 @@ class WebScraper:
                 images = [img['src'] for img in soup.find_all('img')]
                 metadata = soup.find('meta')
 
-                summaries = self.summarizer(paragraphs, max_length=50, min_length=10, num_beams=4, do_sample=False)
+                summaries = self.summarizer(
+                    paragraphs, max_length=50, min_length=10, num_beams=4, do_sample=False)
                 summaries = [summary['summary_text'] for summary in summaries]
 
                 return {
@@ -61,9 +62,11 @@ class WebScraper:
         if target_lang != 'en':
             for key, value in content.items():
                 if isinstance(value, str):
-                    translations[key] = self.translator.translate(value, dest=target_lang).text
+                    translations[key] = self.translator.translate(
+                        value, dest=target_lang).text
                 elif isinstance(value, list):
-                    translations[key] = [self.translator.translate(text, dest=target_lang).text for text in value]
+                    translations[key] = [self.translator.translate(
+                        text, dest=target_lang).text for text in value]
                 else:
                     translations[key] = value
         else:
@@ -110,7 +113,8 @@ class AutonomyPlatform:
 
     def translate_content(self, content, target_lang):
         if target_lang in self.languages:
-            translated_content = self.web_scraper.translate_content(content, target_lang)
+            translated_content = self.web_scraper.translate_content(
+                content, target_lang)
             return translated_content
         else:
             return content
@@ -129,20 +133,26 @@ class AutonomyPlatform:
             time.sleep(2)
             print("Profit generated!")
 
-            schedule_option = input("Do you want to schedule regular content updates? (y/n): ")
+            schedule_option = input(
+                "Do you want to schedule regular content updates? (y/n): ")
 
             if schedule_option.lower() == 'y':
-                update_frequency = input("Enter update frequency (daily, weekly, etc.): ")
-                self.schedule_content_updates(query, target_lang, update_frequency)
+                update_frequency = input(
+                    "Enter update frequency (daily, weekly, etc.): ")
+                self.schedule_content_updates(
+                    query, target_lang, update_frequency)
 
     def schedule_content_updates(self, query, target_lang, update_frequency):
         while True:
             current_time = datetime.now()
-            next_update_time = current_time + timedelta(days=1) if update_frequency.lower() == 'daily' else current_time + timedelta(weeks=1)
+            next_update_time = current_time + \
+                timedelta(days=1) if update_frequency.lower(
+                ) == 'daily' else current_time + timedelta(weeks=1)
 
             if next_update_time.hour == 0 and next_update_time.minute == 0:
                 summary = self.process_search_query(query)
-                translated_summary = self.translate_content(summary, target_lang)
+                translated_summary = self.translate_content(
+                    summary, target_lang)
                 print(translated_summary)
                 time.sleep(2)
                 print("Profit generated!")
