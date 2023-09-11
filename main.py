@@ -17,10 +17,8 @@ class SearchEngine:
         response = requests.get(search_url)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
-            for link in soup.find_all('a'):
-                url = link.get('href')
-                search_results.append(url)
-
+            search_results = [link.get('href') for link in soup.find_all(
+                'a') if link.get('href')]
         return search_results
 
 
@@ -85,8 +83,7 @@ class ContentAggregator:
     def generate_summary(self):
         summary = ''
         for c in self.content:
-            for p in c['paragraphs']:
-                summary += p + '\n'
+            summary += '\n'.join(c['paragraphs']) + '\n'
 
         return summary
 
@@ -135,8 +132,8 @@ class AutonomyPlatform:
 
             schedule_option = input(
                 "Do you want to schedule regular content updates? (y/n): ")
-
-            if schedule_option.lower() == 'y':
+            schedule_option = schedule_option.lower()
+            if schedule_option == 'y':
                 update_frequency = input(
                     "Enter update frequency (daily, weekly, etc.): ")
                 self.schedule_content_updates(
@@ -145,9 +142,9 @@ class AutonomyPlatform:
     def schedule_content_updates(self, query, target_lang, update_frequency):
         while True:
             current_time = datetime.now()
-            next_update_time = current_time + \
-                timedelta(days=1) if update_frequency.lower(
-                ) == 'daily' else current_time + timedelta(weeks=1)
+            hours_remaining = (24 - current_time.hour - 1) + \
+                24 * (update_frequency.lower() == 'daily')
+            next_update_time = current_time + timedelta(hours=hours_remaining)
 
             if next_update_time.hour == 0 and next_update_time.minute == 0:
                 summary = self.process_search_query(query)
